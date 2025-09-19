@@ -13,7 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.databinding.FragmentRegisterBinding
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.models.UserRequest
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.utils.NetworkResult
+import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.utils.TokenManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterFragment : Fragment() {
@@ -21,10 +23,13 @@ class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-
     //In fragment we have kotlin extension ,
     // by the help of this we make viewmodel object, we don't use viewmodel provider, behind the scene same is called
     private val authViewModel by viewModels<AuthViewModel>() //here we are using by viewmodel delegation
+
+    @Inject
+    lateinit var tokenManager: TokenManager
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +37,9 @@ class RegisterFragment : Fragment() {
     ): View? {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
 
-
+//        if (tokenManager.getToken() != null){
+//            findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
+//        }
         return binding.root
     }
 
@@ -88,6 +95,7 @@ class RegisterFragment : Fragment() {
             when (it) {
                 is NetworkResult.Success -> {
                     //add token handling
+                    tokenManager.saveToken(it.data!!.token)
                     findNavController().navigate(R.id.action_registerFragment_to_mainFragment)
 
                 }

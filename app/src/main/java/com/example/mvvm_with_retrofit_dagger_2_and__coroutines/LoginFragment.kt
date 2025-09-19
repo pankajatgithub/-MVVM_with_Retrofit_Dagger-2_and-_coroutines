@@ -12,7 +12,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.databinding.FragmentLoginBinding
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.models.UserRequest
 import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.utils.NetworkResult
+import com.example.mvvm_with_retrofit_dagger_2_and__coroutines.utils.TokenManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -21,6 +23,8 @@ class LoginFragment : Fragment() {
     private val binding get() = _binding!!
     private val authViewModel by viewModels<AuthViewModel>()
 
+    @Inject
+    lateinit var tokenManager: TokenManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,10 +73,12 @@ class LoginFragment : Fragment() {
     }
 
     private fun bindObserver() {
+
         authViewModel.userResponseLiveData.observe(viewLifecycleOwner, Observer {
             binding.progressBar.isVisible = false
             when (it) {
                 is NetworkResult.Success -> {
+                    tokenManager.saveToken(it.data!!.token)
                     findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
 
                 }
